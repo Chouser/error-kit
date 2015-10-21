@@ -1,4 +1,4 @@
-;   Copyright (c) Chris Houser, Jan 2009. All rights reserved.
+;   Copyright (c) Chris Houser, Jan 2009-Nov 2015. All rights reserved.
 ;   The use and distribution terms for this software are covered by the
 ;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
 ;   which can be found in the file epl-v10.html at the root of this distribution.
@@ -11,15 +11,12 @@
 ; Please contact Chouser if you have any suggestions for better names
 ; or API adjustments.
 
-(ns 
-  #^{:author "Chris Houser",
-     :doc "EXPERIMENTAL
+(ns net.n01se.error-kit
+  "EXPERIMENTAL
 System for defining and using custom errors
 Please contact Chouser if you have any suggestions for better names
-or API adjustments."} 
-  clojure.contrib.error-kit
-  (:use [clojure.contrib.def :only (defvar defvar-)]
-        [clojure.stacktrace :only (root-cause)]))
+or API adjustments."
+  (:use [clojure.stacktrace :only (root-cause)]))
 
 (defn- make-ctrl-exception [msg data]
   "Create an exception object with associated data, used for passing
@@ -28,12 +25,16 @@ or API adjustments."}
     (toString [] (str "Error Kit Control Exception: " msg ", " (pr-str data)))
     (deref [] data)))
 
-(defvar- ctrl-exception-class
+(def ^:private ctrl-exception-class
   (class (make-ctrl-exception nil nil)))
 
-(defvar- *handler-stack* () "Stack of bound handler symbols")
+(def ^:private ^:dynamic *handler-stack*
+  "Stack of bound handler symbols"
+  ())
 
-(defvar- *continues* {} "Map of currently available continue forms")
+(def ^:private ^:dynamic *continues*
+  "Map of currently available continue forms"
+  {})
 
 
 (defmacro throw-msg
